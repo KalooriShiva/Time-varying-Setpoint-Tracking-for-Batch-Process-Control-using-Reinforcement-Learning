@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import matplotlib.pyplot as plt
 from temp_setpoint import Tref, time_list, n_tf
 from reactor_model import max_temp, min_temp, max_conc, min_conc, num_temp, num_conc, temp_list, conc_list, tj_list, state_index, new_state, T, Ca
 import time
@@ -88,12 +89,13 @@ def train_rl_model(num_episodes):
                                - Q_matrix[i, curr_temp_index, curr_conc_index, jacket_temp_index])
             state = np.array([temp_list[temp_index], conc_list[conc_index]]).reshape(-1, 1)
         episode_versus_reward[episode_index] = np.array([episode_index, sum([transition[2] for transition in episode])])
+        print("Episode : ", episode_index)
     return episode_versus_reward
 
 
 if __name__ == "__main__":
     start_time = time.perf_counter()
-    episodes_versus_reward = train_rl_model(1_000_000)
+    episodes_versus_reward = train_rl_model(100000)
     cpu_time = time.perf_counter() - start_time
     curr_state = np.array([298, 0.6]).reshape(-1, 1)
     state_arr = np.zeros_like(time_list)
@@ -120,11 +122,13 @@ if __name__ == "__main__":
         legend="full",
         label="Reference temperature",
     )
-    df.to_excel(f"TD_{n_tf}.xlsx")
+    plt.show()
+    #df.to_excel(f"TD_{n_tf}.xlsx")
     MAE = np.sum(np.abs(state_arr-Tref))/len(state_arr)
     RMSE = (np.sum((state_arr-Tref)**2)/len(state_arr))**0.5
     episode_vs_reward_df = pd.DataFrame({"Episodes": episodes_versus_reward[:, 0], "Reward": episodes_versus_reward[:, 1]})
-    # sns.lineplot(episode_vs_reward_df, x="Episodes", y="Reward")
+    sns.lineplot(episode_vs_reward_df, x="Episodes", y="Reward")
+    plt.show()
     days = int(cpu_time // 86400)
     hrs = int((cpu_time -  86400 * days) // 3600)
     mins = int((cpu_time - 3600 * hrs - 86400 * days) // 60)
