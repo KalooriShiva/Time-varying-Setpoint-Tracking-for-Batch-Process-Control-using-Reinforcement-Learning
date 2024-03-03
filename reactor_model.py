@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Nov  9 22:31:10 2022
-
-@author: abuth
-"""
 
 import numpy as np
 from temp_setpoint import dt, n_tf, time_list
