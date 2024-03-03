@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import matplotlib.pyplot as plt
 from temp_setpoint import Tref, time_list, n_tf
 from reactor_model import max_temp, min_temp, max_conc, min_conc, num_temp, num_conc, temp_list, conc_list, tj_list, state_index, new_state, T, Ca
 import time
@@ -167,7 +168,7 @@ def train_rl_model(num_episodes):
             # epsilon greedy action selection
             action_index = policy(Q, state, t, e)
             action = tj_list[action_index]
-            print(action_index)
+            #print(action_index)
             # executing action, observing reward and next state to store experience in tuple
             next_state = new_state(state, action)
             if t == 0: reward = calc_reward(state, action, action, t)
@@ -198,6 +199,7 @@ def train_rl_model(num_episodes):
             state = next_state
         if episode_index % set_steps == 0:
             Q_t.set_weights(Q.get_weights())
+        print("Episode :",episode_index)
     return Q
 
 """# Running reactor to check performance"""
@@ -235,6 +237,7 @@ if __name__ == "__main__":
         legend="full",
         label="Reference Temperature",
     )
+    plt.show()
     # sns.lineplot(x=time_list, y=action_arr, drawstyle='steps-pre', label="Jacket Temperature")
 
     MAE = np.sum(np.abs(state_arr-Tref))/len(state_arr)
