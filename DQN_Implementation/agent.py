@@ -26,7 +26,7 @@ class ReplayMemory:
 
 class DQNAgent:
     
-    def __init__(self, environment, learning_rate=1e-3, decay_rate=1e-4, discount_factor=1, epsilon=0.05, batch_size=20000, replay_memory_size= 12000, nn_arch=[400, 300, 200], reset_steps=9):
+    def __init__(self, environment, learning_rate=1e-3, decay_rate=1e-4, discount_factor=1, epsilon=0.05, batch_size=2000, replay_memory_size= 5000, nn_arch=[400, 300, 200], reset_steps=9):
         self.env = environment
         self.discount_factor = discount_factor
         self.epsilon = epsilon

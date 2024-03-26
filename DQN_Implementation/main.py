@@ -11,7 +11,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 import tensorflow as tf
 if __name__ == "__main__":
     env = Environment(timesteps=40, num_j_temp=40)
-    agent = DQNAgent(learning_rate=1e-3, decay_rate=1e-4, batch_size=20000, replay_memory_size=12000, environment=env, reset_steps=9, nn_arch=[400, 300, 200])
+    agent = DQNAgent(learning_rate=1e-3, decay_rate=1e-4, batch_size=2000, replay_memory_size=5000, environment=env, reset_steps=9, nn_arch=[400, 300, 200])
     start_time = time.perf_counter()
     episode_versus_reward = agent.train(10000)
     # agent.Q = tf.keras.models.load_model(r"C:\Users\Dr Nabil\Desktop\Shiva_DQN_Random_Trajectory\Q_50000.h5")
