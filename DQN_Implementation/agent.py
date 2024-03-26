@@ -44,7 +44,7 @@ class DQNAgent:
         
     def _get_model(self, nn_arch):
         model = tf.keras.models.Sequential()
-        model.add(tf.keras.layers.Dense(nn_arch[0], input_shape=(3,), activation="relu"))
+        model.add(tf.keras.layers.Dense(nn_arch[0], input_shape=(4,), activation="relu"))
         for num_neurons in nn_arch[1:]:
             model.add(tf.keras.layers.Dense(num_neurons, activation="relu"))
         model.add(tf.keras.layers.Dense(self.env.num_j_temp, activation="linear"))
@@ -99,10 +99,10 @@ class DQNAgent:
     def train(self, num_episodes):
         iter_num = 0
         episode_versus_reward = np.zeros((num_episodes, 2))
-        # #episode_versus_reward = np.zeros((num_episodes, 2))
-        # plt.ion()  # Turn on interactive mode
-        # fig, ax = plt.subplots()
-        # line, = ax.plot([], [])  # Empty plot to be updated dynamically
+        #episode_versus_reward = np.zeros((num_episodes, 2))
+        plt.ion()  # Turn on interactive mode
+        fig, ax = plt.subplots()
+        line, = ax.plot([], [])  # Empty plot to be updated dynamically
 
 
         for episode_index in range(num_episodes):
@@ -146,12 +146,12 @@ class DQNAgent:
             if episode_index % 1 == 0:
                 # Update the plot dynamically
                 episode_versus_reward[episode_index] = np.array([episode_index, cumulative_reward])
-        #         line.set_data(episode_versus_reward[:episode_index+1, 0], episode_versus_reward[:episode_index+1, 1])
-        #         ax.relim()
-        #         ax.autoscale_view()
-        #         plt.draw()
-        #         plt.pause(0.001)  # Adjust the pause time as needed
+                line.set_data(episode_versus_reward[:episode_index+1, 0], episode_versus_reward[:episode_index+1, 1])
+                ax.relim()
+                ax.autoscale_view()
+                plt.draw()
+                plt.pause(0.001)  # Adjust the pause time as needed
             
-        # plt.ioff()
-        # plt.show()
+        plt.ioff()
+        plt.show()
         return episode_versus_reward

@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from reactor_environments import Environment
-from agents import DQNAgent
+from reactor_environment import Environment
+from agent import DQNAgent
 import time 
 import matplotlib.pyplot as plt
 import time 
@@ -13,7 +13,7 @@ if __name__ == "__main__":
     env = Environment(timesteps=40, num_j_temp=40)
     agent = DQNAgent(learning_rate=1e-3, decay_rate=1e-4, batch_size=20000, replay_memory_size=12000, environment=env, reset_steps=9, nn_arch=[400, 300, 200])
     start_time = time.perf_counter()
-    episode_versus_reward = agent.train(200000)
+    episode_versus_reward = agent.train(10000)
     # agent.Q = tf.keras.models.load_model(r"C:\Users\Dr Nabil\Desktop\Shiva_DQN_Random_Trajectory\Q_50000.h5")
     agent.Q.save("Q_network.h5")
     cpu_time = time.perf_counter() - start_time
@@ -22,7 +22,7 @@ if __name__ == "__main__":
     action_arr = np.zeros_like(env.time_list)
     reward_arr = np.zeros_like(env.time_list)
     episode_vs_reward_df = pd.DataFrame({"Episodes": episode_versus_reward[:, 0], "Reward": episode_versus_reward[:, 1]})
-    env.curr_state = np.vstack([0, 298, 0.6])
+    env.curr_state = np.vstack([0, 298, 0.6, 298-env.Tref[0]])
     state = env.curr_state
     for i in range(env.n_tf):
         state_arr[i] = state[env.T, 0]

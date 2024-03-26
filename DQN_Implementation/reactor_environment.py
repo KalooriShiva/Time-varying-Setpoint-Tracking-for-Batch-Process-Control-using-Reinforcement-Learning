@@ -1,13 +1,11 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 class Environment:
     
     def __init__(self, timesteps=40, batch_time=80, min_temp=293, 
                  max_temp=308, min_conc=0, max_conc=1, num_temp=10, 
                  num_conc=10, min_j_temp=273, max_j_temp=318, num_j_temp=40):
-        self.curr_state = np.vstack(
-            [0, np.random.uniform(min_temp, max_temp), np.random.uniform(min_conc, max_conc)]
-        )
         self.dt = batch_time / timesteps
         self.tf = batch_time
         self.n_tf = timesteps
@@ -31,8 +29,13 @@ class Environment:
         self.T = 1
         self.Ca = 2
         self._init_ref_temp()
-        self.state_dim = 3
+        self.state_dim = 4
         self.action_dim = 1
+        self.curr_state_temp = np.random.uniform(min_temp, max_temp)
+        self.curr_state_conc = np.random.uniform(min_conc,max_conc)
+        self.curr_state = np.vstack(
+            [0, self.curr_state_temp, self.curr_state_conc,self.curr_state_temp - self.Tref[0]]
+        )
  
 
     def _init_ref_temp(self):
@@ -85,6 +88,8 @@ class Environment:
         Q = np.array([[1, 0],[0, 1]])
         R = 0.1
         Tj = action
+        curr_time_step  = self.curr_state[0, 0]
+        error = 0
         new_T = self.curr_state[T, 0] + \
                 dt * (C1 * (self.curr_state[T, 0] - Tj) + \
                 C2 * np.exp(-Ea_R/self.curr_state[T, 0]) * \
@@ -92,13 +97,16 @@ class Environment:
         # Reference expression: Ca(k+1) = Ca(k) - dt*k0*exp(-Ea/RT(k))*Ca(k)^2
         new_Ca = self.curr_state[Ca, 0] - \
                  dt * k0*(self.curr_state[Ca, 0]**2)*np.exp(-1*Ea_R/self.curr_state[T, 0])
+        if curr_time_step+1 < self.n_tf:
+            error = new_T - self.Tref[int(curr_time_step)+1]
         if new_Ca < 0: new_Ca = 0
-        next_state = np.vstack([self.curr_state[0, 0] + 1, new_T, new_Ca])
+
+        next_state = np.vstack([curr_time_step + 1, new_T, new_Ca,error])
         if self.prev_action is None:
             d_action = 0
         else:
             d_action = action - self.prev_action
-        error_term = self.curr_state[1:] - np.vstack([self.Tref[int(self.curr_state[0, 0])], 0])
+        error_term = self.curr_state[1:3] - np.vstack([self.Tref[int(self.curr_state[0, 0])], 0])
         reward = error_term.T @ (Q @ error_term) + R * (d_action**2)
         self.prev_action = action
         self.done = self.curr_state[0, 0] + 1 == self.n_tf
@@ -124,7 +132,7 @@ class Environment:
     
     def reset(self):
         self.curr_state = np.vstack(
-            [0, np.random.uniform(self.min_temp, self.max_temp), np.random.uniform(self.min_conc, self.max_conc)]
+            [0, np.random.uniform(self.min_temp, self.max_temp), np.random.uniform(self.min_conc, self.max_conc),np.random.uniform(self.min_temp, self.max_temp)- int(self.Tref[0])]
         )
         self.prev_action = None
         self.done = False
@@ -150,3 +158,4 @@ if __name__ == "__main__":
         x="time",
         y="State",
     )
+    plt.show()
