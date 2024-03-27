@@ -34,7 +34,7 @@ class Environment:
         self.curr_state_temp = np.random.uniform(min_temp, max_temp)
         self.curr_state_conc = np.random.uniform(min_conc,max_conc)
         self.curr_state = np.vstack(
-            [0, self.curr_state_temp, self.curr_state_conc,self.curr_state_temp - self.Tref[0]]
+            [0, self.curr_state_temp, self.curr_state_conc, self.curr_state_temp - self.Tref[0]]
         )
  
 
@@ -106,8 +106,10 @@ class Environment:
             d_action = 0
         else:
             d_action = action - self.prev_action
-        error_term = self.curr_state[1:3] - np.vstack([self.Tref[int(self.curr_state[0, 0])], 0])
-        reward = error_term.T @ (Q @ error_term) + R * (d_action**2)
+        error_term = self.curr_state[1:2] - np.vstack([self.Tref[int(self.curr_state[0, 0])]])
+        # error_term2 = self.curr_state[1]-
+        # reward = error_term.T @ (Q @ error_term) + R * (d_action**2)
+        reward = abs(error_term) + abs(d_action)
         self.prev_action = action
         self.done = self.curr_state[0, 0] + 1 == self.n_tf
         self.curr_state = next_state
